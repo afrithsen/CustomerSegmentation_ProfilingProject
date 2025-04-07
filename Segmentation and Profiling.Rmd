@@ -1,0 +1,329 @@
+---
+title: "Segmentation and Profiling Project - Supervised"
+author: "AFrithsen"
+date: "2024-12-07"
+output: pdf_document
+editor_options: 
+  chunk_output_type: inline
+---
+```{r}
+library(rpart)
+library(rpart.plot)
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+
+#load data
+customers <- read_csv("C:/Users/Amanda/Documents/Visual Data Exploration/Assignment #3 Segmentation and Profiling Project/Customer Data.csv")
+```
+
+```{r}
+# examining summary statistics to determine variables to use
+
+#Gender
+summary_tenure_statistics_by_gender <- customers %>% 
+  group_by(Gender) %>% 
+  summarize(
+    average_tenure = mean(TelecomProviderTenure_months, na.rm=TRUE), 
+    sd_tenure = sd(TelecomProviderTenure_months, na.rm=TRUE),
+    median_tenure = median(TelecomProviderTenure_months, na.rm=TRUE),
+    iqr = IQR(TelecomProviderTenure_months, na.rm=TRUE),
+    count = n()
+    )
+
+print(summary_tenure_statistics_by_gender)
+# Region
+summary_tenure_statistics_by_region <- customers %>% 
+  group_by(Region) %>% 
+  summarize(
+    average_tenure = mean(TelecomProviderTenure_months, na.rm=TRUE), 
+    sd_tenure = sd(TelecomProviderTenure_months, na.rm=TRUE),
+    median_tenure = median(TelecomProviderTenure_months, na.rm=TRUE),
+    iqr = IQR(TelecomProviderTenure_months, na.rm=TRUE),
+    count = n()
+    )
+
+print(summary_tenure_statistics_by_region)
+
+
+# Town Size
+summary_tenure_statistics_by_townsize <- customers %>% 
+  group_by(Town_size) %>% 
+  summarize(
+    average_tenure = mean(TelecomProviderTenure_months, na.rm=TRUE), 
+    sd_tenure = sd(TelecomProviderTenure_months, na.rm=TRUE),
+    median_tenure = median(TelecomProviderTenure_months, na.rm=TRUE),
+    iqr = IQR(TelecomProviderTenure_months, na.rm=TRUE),
+    count = n()
+    )
+
+print(summary_tenure_statistics_by_townsize)
+
+# Age Groups
+summary_tenure_statistics_by_age <- customers %>% 
+  group_by(AgeGroups) %>% 
+  summarize(
+    average_tenure = mean(TelecomProviderTenure_months, na.rm=TRUE), 
+    sd_tenure = sd(TelecomProviderTenure_months, na.rm=TRUE),
+    median_tenure = median(TelecomProviderTenure_months, na.rm=TRUE),
+    iqr = IQR(TelecomProviderTenure_months, na.rm=TRUE),
+    count = n()
+    )
+
+print(summary_tenure_statistics_by_age)
+
+#Education Level
+summary_tenure_statistics_by_educationlevel <- customers %>% 
+  group_by(EducationLevel) %>% 
+  summarize(
+    average_tenure = mean(TelecomProviderTenure_months, na.rm=TRUE), 
+    sd_tenure = sd(TelecomProviderTenure_months, na.rm=TRUE),
+    median_tenure = median(TelecomProviderTenure_months, na.rm=TRUE),
+    iqr = IQR(TelecomProviderTenure_months, na.rm=TRUE),
+    count = n()
+    )
+
+print(summary_tenure_statistics_by_educationlevel)
+
+#HomeOwnership
+summary_tenure_statistics_by_homeown <- customers %>% 
+  group_by(HomeOwnership) %>% 
+  summarize(
+    average_tenure = mean(TelecomProviderTenure_months, na.rm=TRUE), 
+    sd_tenure = sd(TelecomProviderTenure_months, na.rm=TRUE),
+    median_tenure = median(TelecomProviderTenure_months, na.rm=TRUE),
+    iqr = IQR(TelecomProviderTenure_months, na.rm=TRUE),
+    count = n()
+    )
+
+print(summary_tenure_statistics_by_homeown)
+
+#JobCategory
+summary_tenure_statistics_by_job <- customers %>% 
+  group_by(JobCategory) %>% 
+  summarize(
+    average_tenure = mean(TelecomProviderTenure_months, na.rm=TRUE), 
+    sd_tenure = sd(TelecomProviderTenure_months, na.rm=TRUE),
+    median_tenure = median(TelecomProviderTenure_months, na.rm=TRUE),
+    iqr = IQR(TelecomProviderTenure_months, na.rm=TRUE),
+    count = n()
+    )
+
+print(summary_tenure_statistics_by_job)
+
+#Retired
+summary_tenure_statistics_by_retired <- customers %>% 
+  group_by(Retired) %>% 
+  summarize(
+    average_tenure = mean(TelecomProviderTenure_months, na.rm=TRUE), 
+    sd_tenure = sd(TelecomProviderTenure_months, na.rm=TRUE),
+    median_tenure = median(TelecomProviderTenure_months, na.rm=TRUE),
+    iqr = IQR(TelecomProviderTenure_months, na.rm=TRUE),
+    count = n()
+    )
+
+print(summary_tenure_statistics_by_retired)
+
+#Marital Status
+summary_tenure_statistics_by_maritalstatus <- customers %>% 
+  group_by(MaritalStatus) %>% 
+  summarize(
+    average_tenure = mean(TelecomProviderTenure_months, na.rm=TRUE), 
+    sd_tenure = sd(TelecomProviderTenure_months, na.rm=TRUE),
+    median_tenure = median(TelecomProviderTenure_months, na.rm=TRUE),
+    iqr = IQR(TelecomProviderTenure_months, na.rm=TRUE),
+    count = n()
+    )
+
+print(summary_tenure_statistics_by_maritalstatus)
+
+#Marital Status
+summary_tenure_statistics_by_retired <- customers %>% 
+  group_by(Retired) %>% 
+  summarize(
+    average_tenure = mean(TelecomProviderTenure_months, na.rm=TRUE), 
+    sd_tenure = sd(TelecomProviderTenure_months, na.rm=TRUE),
+    median_tenure = median(TelecomProviderTenure_months, na.rm=TRUE),
+    iqr = IQR(TelecomProviderTenure_months, na.rm=TRUE),
+    count = n()
+    )
+
+print(summary_tenure_statistics_by_retired)
+
+
+```
+
+```{r}
+# visualize variables of interest
+g <- ggplot(data=customers) + geom_histogram(aes(x=TelecomProviderTenure_months), binwidth = 5)
+print(g)
+
+g <- ggplot(data=customers)+ geom_bar(aes(x=NumberPlans))
+print(g)
+
+g <- ggplot(data=customers)+ geom_bar(aes(x=NumberSubscriptions))
+print(g)
+
+g <- ggplot(data=customers)+ geom_bar(aes(x=NumberDevices))
+print(g)
+
+g <- ggplot(data=customers)+ geom_bar(aes(x=NumberServices))
+print(g)
+
+g <- ggplot(data=customers) + geom_histogram(aes(x=EquipmentMonthlyUsage), binwidth = 10)
+print(g)
+
+g <- ggplot(data=customers) + geom_histogram(aes(x=MonthlyDataUsage), binwidth = 15)
+print(g)
+
+g <- ggplot(data=customers) + geom_histogram(aes(x=VoiceServiceUsage), binwidth = 15)
+print(g)
+
+g <- ggplot(data=customers) + geom_histogram(aes(x=StreamingHours), binwidth = 2)
+print(g)
+```
+```{r}
+# create discrete variable for Equipment Usage and Data Usage
+customers$EquipmentUse <- cut(customers$EquipmentMonthlyUsage, breaks =c(-1, 1, 105), labels=c("No", "Yes"))
+
+customers$DataUse <- cut(customers$MonthlyDataUsage, breaks =c(-1, 1, 205), labels=c("No", "Yes"))
+
+customers$VoiceService <- NULL
+
+customers$Plans <- cut (customers$NumberPlans, breaks= c(-1, 0, 2, 4), labels = c("None", "Few", "Many"))
+```
+
+```{r}
+# Tree Visualization
+#create CART tree
+
+tree <- rpart(TelecomProviderTenure_months ~ Plans + DataUse, data = customers, control = rpart.control(cp=0.0001))
+bestcp <- tree$cptable[which.min(tree$cptable[,"xerror"]), "CP"]
+tree.pruned <- prune(tree, cp = bestcp)
+prp(tree, faclen=0, cex=0.8, extra =1)
+```
+
+```{r}
+#Profiling
+customers$CARTsegments <- ifelse(customers$Plans=="None", 1, 0)
+customers$CARTsegments <- ifelse(customers$DataUse == "Yes" & customers$Plans == "Few", 2, customers$CARTsegments)
+customers$CARTsegments <- ifelse(customers$DataUse == "Yes" & customers$Plans == "Many", 3, customers$CARTsegments)
+customers$CARTsegments <- ifelse(customers$DataUse == "No" & customers$Plans == "Few", 4, customers$CARTsegments)
+customers$CARTsegments <- ifelse(customers$DataUse == "No" & customers$Plans == "Many", 5, customers$CARTsegments)
+
+customers$CARTsegments <- as.factor(customers$CARTsegments)
+
+customers %>% 
+  select(c("CARTsegments", "TelecomProviderTenure_months")) %>% 
+  add_count(CARTsegments) %>% 
+  group_by(CARTsegments) %>% 
+  summarize(
+    mean_tenure = mean(TelecomProviderTenure_months, na.rm = TRUE),
+    median_tenure = median(TelecomProviderTenure_months, na.rm = TRUE),
+    sd_tenure = sd(TelecomProviderTenure_months, na.rm = TRUE),
+    iqr_tenure = IQR(TelecomProviderTenure_months, na.rm = TRUE),
+    min_tenure = min(TelecomProviderTenure_months, na.rm = TRUE),
+    max_tenure = max(TelecomProviderTenure_months, na.rm = TRUE)
+  )
+```
+
+```{r}
+tree <- rpart(TelecomProviderTenure_months ~ Plans + DataUse + StreamingHours, data = customers, control = rpart.control(cp=0.0005))
+bestcp <- tree$cptable[which.min(tree$cptable[,"xerror"]), "CP"]
+tree.pruned <- prune(tree, cp = bestcp)
+prp(tree, faclen=0, cex=0.8, extra =1)
+```
+```{r}
+customers$StreamingGroups <- cut(customers$StreamingHours, breaks =c(-1, 10, 17, 28, 39), labels=c("Low", "Light", "Moderate", "High"))
+```
+
+```{r}
+tree <- rpart(TelecomProviderTenure_months ~ Plans + DataUse + StreamingGroups, data = customers, control = rpart.control(cp=0.0005))
+bestcp <- tree$cptable[which.min(tree$cptable[,"xerror"]), "CP"]
+tree.pruned <- prune(tree, cp = bestcp)
+prp(tree, faclen=0, cex=0.8, extra =1)
+```
+```{r}
+#Profiling
+customers$CARTsegments <- ifelse(customers$Plans=="None", 1, 0)
+
+customers$CARTsegments <- ifelse(customers$DataUse == "Yes" & customers$Plans == "Many", 2, customers$CARTsegments)
+
+customers$CARTsegments <- ifelse(customers$DataUse == "Yes" & customers$Plans == "Few" & customers$StreamingGroups == "Low" | customers$StreamingGroups == "Light" | customers$StreamingGroups == "Moderate", 3, customers$CARTsegments)
+
+customers$CARTsegments <- ifelse(customers$DataUse == "Yes" & customers$Plans == "Few" & customers$StreamingGroups=="High", 4, customers$CARTsegments)
+
+customers$CARTsegments <- ifelse(customers$DataUse == "No" & customers$Plans == "Few" & customers$StreamingGroups == "Low", 5, customers$CARTsegments)
+
+customers$CARTsegments <- ifelse(customers$DataUse == "No" & customers$Plans == "Few" & customers$StreamingGroups == "Light" | customers$StreamingGroups == "Moderate" | customers$StreamingGroups =="High", 6, customers$CARTsegments)
+
+customers$CARTsegments <- ifelse(customers$DataUse == "No" & customers$Plans == "Many", 7, customers$CARTsegments)
+
+customers$CARTsegments <- as.factor(customers$CARTsegments)
+
+customers %>% 
+  select(c("CARTsegments", "TelecomProviderTenure_months")) %>% 
+  add_count(CARTsegments) %>% 
+  group_by(CARTsegments) %>% 
+  summarize(
+    mean_tenure = mean(TelecomProviderTenure_months, na.rm = TRUE),
+    median_tenure = median(TelecomProviderTenure_months, na.rm = TRUE),
+    sd_tenure = sd(TelecomProviderTenure_months, na.rm = TRUE),
+    iqr_tenure = IQR(TelecomProviderTenure_months, na.rm = TRUE),
+    min_tenure = min(TelecomProviderTenure_months, na.rm = TRUE),
+    max_tenure = max(TelecomProviderTenure_months, na.rm = TRUE))
+```
+
+```{r}
+tree <- rpart(TelecomProviderTenure_months ~ Plans + DataUse + StreamingGroups + VoiceServiceUsage, data = customers, control = rpart.control(cp=0.001))
+bestcp <- tree$cptable[which.min(tree$cptable[,"xerror"]), "CP"]
+tree.pruned <- prune(tree, cp = bestcp)
+prp(tree, faclen=0, cex=0.8, extra =1)
+```
+```{r}
+customers$VoiceServiceGroups <- cut(customers$VoiceServiceUsage, breaks =c(-1, 14, 28, 44, 55, 77, 600), labels=c("Low", "Moderately Low", "Moderate", "Moderately High", "High", "Very High"))
+```
+
+```{r}
+tree <- rpart(TelecomProviderTenure_months ~ Plans + DataUse + StreamingGroups + VoiceServiceGroups, data = customers, control = rpart.control(cp=0.003))
+bestcp <- tree$cptable[which.min(tree$cptable[,"xerror"]), "CP"]
+tree.pruned <- prune(tree, cp = bestcp)
+prp(tree, faclen=0, cex=0.8, extra =1)
+```
+```{r}
+customers$CARTsegments <- ifelse(customers$VoiceServiceGroups=="Low", 1, 0)
+
+customers$CARTsegments <- ifelse(customers$VoiceServiceGroups == "Moderately Low" & customers$Plans == "None", 2, customers$CARTsegments)
+
+customers$CARTsegments <- ifelse(customers$VoiceServiceGroups == "Moderately Low" & customers$Plans != "None", 3, customers$CARTsegments)
+
+customers$CARTsegments <- ifelse(customers$VoiceServiceGroups == "Moderate" & customers$Plans == "None", 4, customers$CARTsegments)
+
+customers$CARTsegments <- ifelse(customers$VoiceServiceGroups == "Moderate" & customers$Plans != "None", 5, customers$CARTsegments)
+
+customers$CARTsegments <- ifelse(customers$VoiceServiceGroups == "Moderately High", 6, customers$CARTsegments)
+
+customers$CARTsegments <- ifelse(customers$VoiceServiceGroups == "High", 7, customers$CARTsegments)
+
+customers$CARTsegments <- ifelse(customers$VoiceServiceGroups == "Very High", 8, customers$CARTsegments)
+
+customers$CARTsegments <- as.factor(customers$CARTsegments)
+
+customers %>% 
+  select(c("CARTsegments", "TelecomProviderTenure_months")) %>% 
+  add_count(CARTsegments) %>% 
+  group_by(CARTsegments) %>% 
+  summarize(
+    mean_tenure = mean(TelecomProviderTenure_months, na.rm = TRUE),
+    median_tenure = median(TelecomProviderTenure_months, na.rm = TRUE),
+    sd_tenure = sd(TelecomProviderTenure_months, na.rm = TRUE),
+    iqr_tenure = IQR(TelecomProviderTenure_months, na.rm = TRUE),
+    min_tenure = min(TelecomProviderTenure_months, na.rm = TRUE),
+    max_tenure = max(TelecomProviderTenure_months, na.rm = TRUE))
+```
+
+```{r}
+customers_supervised <- customers[, c("Customer ID", "CARTsegments")]
+write.csv(customers_supervised, "Customers_supervised_segments.csv", row.names = FALSE)
+```
+

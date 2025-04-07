@@ -1,0 +1,78 @@
+---
+title: "Segmentation and Profiling Project - Unsupervised"
+author: "AFrithsen"
+date: "2024-12-08"
+output: pdf_document
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r}
+# import libraries and data
+library(tidyverse)
+
+customers <- read_csv("C:/Users/Amanda/Documents/Visual Data Exploration/Assignment #3 Segmentation and Profiling Project/Customer Data.csv")
+```
+
+```{r}
+# remove unneeded columns
+
+customers_unsupervised <- customers[, c("Customer ID", "NumberPlans", "NumberSubscriptions", "NumberDevices", "NumberServices", "MonthlyDataUsage", "StreamingHours", "VoiceServiceUsage", "TelecomProviderTenure_months")]
+
+print(customers_unsupervised)
+
+points <- customers_unsupervised  %>% select(NumberPlans, NumberSubscriptions, NumberDevices, NumberServices, MonthlyDataUsage, StreamingHours, VoiceServiceUsage, TelecomProviderTenure_months)
+points <- scale(points)
+print(head(points))
+```
+
+
+```{r}
+
+#set seed for code reproductability
+set.seed(1223)
+NUM_CLUSTERS <- 6
+kclust <- kmeans(points, centers = NUM_CLUSTERS)
+```
+
+```{r}
+# add segments to original dataset
+customers_unsupervised$kmeans_segment <- as.factor(kclust$cluster)
+```
+
+```{r}
+#choosing a good number of clusters
+ks <- 1:12
+tot_within_ss <- sapply(ks, function(k){
+  set.seed(1223)
+  cl <- kmeans(points, k)
+  cl$tot.withinss  # Extract the numeric value of tot.withinss
+})
+
+# Plot the total within-cluster sum of squares (tot_within_ss) for each number of clusters
+plot(ks, tot_within_ss, type = "b", xlab = "Number of Segments", ylab = "Total Within SS")
+```
+```{r}
+# set clusters at 6, 7, or 8
+set.seed(1223)
+NUM_CLUSTERS <- 6
+points <- customers_unsupervised %>% select(NumberPlans, NumberSubscriptions, NumberDevices, NumberServices, MonthlyDataUsage, StreamingHours, VoiceServiceUsage, TelecomProviderTenure_months)
+points <- scale(points)
+kclust <- kmeans(points, centers = NUM_CLUSTERS, nstart = 10)
+
+#add segments to original dataset
+customers_unsupervised$kmeans_segment <- as.factor(kclust$cluster)
+
+#segment profiles
+customers_unsupervised %>%
+  select(-`Customer ID`) %>%    # Remove 'Customer ID' column for profile summary
+  add_count(kmeans_segment) %>%  # Add count of customers in each segment
+  group_by(kmeans_segment, n) %>%  # Group by segment and count
+  summarize_all("mean")  # Summarize mean values of all columns for each segment
+```
+
+
+```{r}
+write.csv(customers_unsupervised, file="Customers_unsupervised_segments.csv", row.names = FALSE )
+```
+
