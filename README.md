@@ -1,1 +1,2 @@
-# DataGovernance-PrivacyFinalProject
+# Data Governance & Privacy Final Project
+This project explored methods for safely sharing COVID-19 patient dta while ensuring privacy and compliance with data protection regulations. I employed privacy-preserving techniques such as pseudonymization, aggregation, and k-anonymity to prevent patient identification. Through this process, I aimed to identify the most effective methods for balancing data utility with privacy in health-related data sharing.
